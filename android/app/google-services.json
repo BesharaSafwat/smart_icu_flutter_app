@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "305757418974",
+    "firebase_url": "https://icu-app1-default-rtdb.firebaseio.com",
+    "project_id": "icu-app1",
+    "storage_bucket": "icu-app1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:305757418974:android:83cc1859795108167e194f",
+        "android_client_info": {
+          "package_name": "com.example.icu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEvTraVWx7tNeCiUS8_PovxRlRIPS12b4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
