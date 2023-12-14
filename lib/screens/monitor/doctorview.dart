@@ -9,6 +9,9 @@ import 'package:provider/provider.dart';
 import 'package:icu/screens/monitor/patient_list.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
+//
+import 'package:wifi_info_flutter/wifi_info_flutter.dart';
+
 // ESP CAM imports
 import 'dart:typed_data';
 import 'dart:io';
@@ -18,7 +21,6 @@ import 'package:network_info_plus/network_info_plus.dart';
 
 class DoctorView extends StatefulWidget {
   const DoctorView({super.key});
-
   final String title = 'Doctor View';
   @override
   State<StatefulWidget> createState() => DoctorViewState();
@@ -103,8 +105,10 @@ class DoctorViewState extends State<DoctorView> {
   final AuthService _auth = AuthService();
 
   final databaseReference = FirebaseDatabase.instance.ref();
-  // reference();
   String? uid = FirebaseAuth.instance.currentUser?.uid ;
+
+  bool showCam = false;
+  String buttonText = 'Show';
   // Future getUid() async{
   //     dynamic result = await _auth.loginEmailPass();
   // }
@@ -177,16 +181,6 @@ class DoctorViewState extends State<DoctorView> {
               children: [
                 Column(
                   children: [
-                     jpgData.isNotEmpty ? Image.memory(
-                                              jpgData,
-                                              gaplessPlayback: true,
-                                              width: double.infinity,
-                                              height: 400,
-                     ) : Container(height: 400,width: double.infinity,),
-                  ],
-                ),
-                Column(
-                  children: [
                     Row(
                       children: [
                         Text(
@@ -198,11 +192,13 @@ class DoctorViewState extends State<DoctorView> {
                           stream: _getDataStream('temp'),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
-                              return Text(snapshot.data!,overflow: TextOverflow.ellipsis,  style: Theme.of(context).textTheme.displaySmall,);
+                              return Text(
+                                snapshot.data!
+                                ,overflow: TextOverflow.ellipsis,  style: Theme.of(context).textTheme.displaySmall,);
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}',overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.displaySmall,);
                             } else {
-                              return Text('Loading...', style: Theme.of(context).textTheme.displaySmall,);
+                              return Text('Loading...',overflow: TextOverflow.ellipsis ,style: Theme.of(context).textTheme.displaySmall,);
                             }
                           },
                         ),
@@ -220,7 +216,9 @@ class DoctorViewState extends State<DoctorView> {
                           stream: _getDataStream('heart_rate'),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
-                              return Text(snapshot.data!, overflow: TextOverflow.ellipsis,  style: Theme.of(context).textTheme.displaySmall,);
+                              return Text(
+                                snapshot.data!
+                                , overflow: TextOverflow.ellipsis,  style: Theme.of(context).textTheme.displaySmall,);
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}',overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.displaySmall,);
                             } else {
@@ -246,11 +244,13 @@ class DoctorViewState extends State<DoctorView> {
                                 stream: _getDataStream('systolic_bp'),
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData) {
-                                    return Text(snapshot.data!,overflow: TextOverflow.ellipsis,  style: Theme.of(context).textTheme.displaySmall,);
+                                    return Text(
+                                      snapshot.data!
+                                      ,overflow: TextOverflow.ellipsis,  style: Theme.of(context).textTheme.displaySmall,);
                                   } else if (snapshot.hasError) {
                                     return Text('Error: ${snapshot.error}',overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.displaySmall,);
                                   } else {
-                                    return Text('Loading...', style: Theme.of(context).textTheme.displaySmall,);
+                                    return Text('Loading...', overflow: TextOverflow.ellipsis,style: Theme.of(context).textTheme.displaySmall,);
                                   }
                                 },
                               ),
@@ -262,11 +262,13 @@ class DoctorViewState extends State<DoctorView> {
                                 stream: _getDataStream('diastolic_bp'),
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData) {
-                                    return Text(snapshot.data!,overflow: TextOverflow.ellipsis,  style: Theme.of(context).textTheme.displaySmall,);
+                                    return Text(
+                                      snapshot.data!
+                                      ,overflow: TextOverflow.ellipsis,  style: Theme.of(context).textTheme.displaySmall,);
                                   } else if (snapshot.hasError) {
                                     return Text('Error: ${snapshot.error}',overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.displaySmall,);
                                   } else {
-                                    return Text('Loading...', style: Theme.of(context).textTheme.displaySmall,);
+                                    return Text('Loading...',overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.displaySmall,);
                                   }
                                 },
                               ),
@@ -276,6 +278,48 @@ class DoctorViewState extends State<DoctorView> {
                               // ),
                             ],
                           ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16,),
+                Column(
+                  children: [
+                    (showCam)?
+                    // showCam?
+                    Container(
+                      height: 400,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color:  Colors.blue,
+                      ),
+                      child: Image.memory(
+                        jpgData,
+                        gaplessPlayback: true,
+                        width: double.infinity,
+                        height: 400,
+                      ),
+                    ) : Container(),
+                    SizedBox(height: 16,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton(
+                            onPressed: () async {
+                              await setValueToFirebase('/button',showCam);
+                              setState(() {
+                                showCam = !showCam;
+                                if(showCam){
+                                  buttonText = 'Hide';
+                                }
+                                else{
+                                  buttonText = 'Show';
+                                }
+                              });
+                            },
+                            child: Text(buttonText)
                         ),
                       ],
                     ),
@@ -300,7 +344,26 @@ class DoctorViewState extends State<DoctorView> {
     final databaseReference = FirebaseDatabase.instance.ref().child(req_data);
     return databaseReference.onValue.map((event) => event.snapshot.value.toString());
   }
-  // void captureData(data) {
+  Future<void> setValueToFirebase(String path, dynamic value) async {
+
+    try {
+      final databaseReference = FirebaseDatabase.instance.ref(path);
+      await databaseReference.set(value);
+      print('Data successfully written to $path!');
+    } catch (error) {
+      print('Error setting data to $path: $error');
+    }
+  }
+
+  // Future<InternetAddress> get selfIP async {
+  //   String ip = await Wifi.ip;
+  //   return InternetAddress(ip);
+  // }
+  Future getIP() async{
+    String ipv4 = await Ipify.ipv4();
+    return ipv4 ;
+  }
+// void captureData(data) {
   //   databaseReference.child(data).once().then((DatabaseEvent event) {
   //     DataSnapshot snapshot = event.snapshot;
   //     print('Data: ${snapshot.value}');
@@ -310,6 +373,7 @@ class DoctorViewState extends State<DoctorView> {
   //   });
   // }
 }
+
 class Uint8ListEquality {
   bool equals(Uint8List list1, Uint8List list2) {
     if (list1.length != list2.length) {
