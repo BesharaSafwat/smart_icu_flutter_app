@@ -281,6 +281,30 @@ class DoctorViewState extends State<DoctorView> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Text(
+                          'ECG: ',
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                        const SizedBox(width: 24),
+                        StreamBuilder<String>(
+                          stream: _getDataStream('prediction_values'),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return Text(
+                                snapshot.data!
+                                , overflow: TextOverflow.ellipsis,  style: Theme.of(context).textTheme.displaySmall,);
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}',overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.displaySmall,);
+                            } else {
+                              return Text('Loading...', style: Theme.of(context).textTheme.displaySmall,);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ],
                 ),
                 SizedBox(height: 16,),
